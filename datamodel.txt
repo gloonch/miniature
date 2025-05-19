@@ -1,0 +1,81 @@
+Customer {
+  id: UUID (Primary Key)
+  phone: String (Unique, Not Null)
+  name: String?
+  totalSpent: Float (default: 0)
+  cashbackBalance: Float (default: 0)
+  createdAt: Timestamp
+}
+
+Product {
+  id: UUID (Primary Key)
+  code: String (Unique)          // مثلاً "SL38" - استفاده در کپشن و QR
+  title: String
+  description: Text?
+  price: Float
+  imageUrl: String?
+  stock: Int
+  category: String?
+  isActive: Boolean
+  createdAt: Timestamp
+}
+
+Order {
+  id: UUID (Primary Key)
+  customerId: UUID (ForeignKey → Customer)
+  status: Enum [PENDING, PAID, CONFIRMED, SHIPPED, DELIVERED, CANCELLED]
+  totalAmount: Float
+  deliveryEstimate: String
+  deliveryAddress: Text?
+  paymentProofUrl: String?
+  cashbackApplied: Float
+  createdAt: Timestamp
+  confirmedAt: Timestamp?
+}
+
+OrderItem {
+  id: UUID (Primary Key)
+  orderId: UUID (ForeignKey → Order)
+  productId: UUID (ForeignKey → Product)
+  quantity: Int
+  priceAtOrder: Float
+}
+CashbackLog {
+  id: UUID
+  customerId: UUID (ForeignKey → Customer)
+  amount: Float
+  relatedOrderId: UUID?
+  type: Enum [EARNED, USED]
+  createdAt: Timestamp
+}
+CartItem {
+  id: UUID
+  sessionId: String              // کلید QR session قبل از پرداخت
+  productId: UUID (ForeignKey → Product)
+  quantity: Int
+  scannedAt: Timestamp
+  isFinalized: Boolean (default: false)
+}
+Feedback {
+  id: UUID
+  customerId: UUID (ForeignKey → Customer)
+  orderId: UUID?
+  message: Text
+  sentimentScore: Float?         // اختیاری، توسط AI پر می‌شه
+  createdAt: Timestamp
+}
+
+ProductStats {
+  productId: UUID
+  totalSold: Int
+  totalRevenue: Float
+  lastPurchasedAt: Timestamp
+}
+
+
+Customer ↔ Order (1:N)
+Order ↔ OrderItem (1:N)
+OrderItem ↔ Product (N:1)
+CashbackLog ↔ Customer (N:1)
+CartItem برای QR Scan session حضوری
+Feedback اختیاری برای رضایت‌سنجی و تحلیل رفتار
