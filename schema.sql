@@ -3,10 +3,33 @@ CREATE TABLE customers
     id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     phone            VARCHAR(20) UNIQUE NOT NULL,
     name             TEXT,
+    role             TEXT             DEFAULT 'OWNER',
     total_spent      NUMERIC          DEFAULT 0,
     cashback_balance NUMERIC          DEFAULT 0,
+    is_active        BOOLEAN          DEFAULT TRUE,
     created_at       TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE shops
+(
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    owner_id    UUID REFERENCES customers (id) ON DELETE CASCADE,
+    name        TEXT NOT NULL,
+    description TEXT,
+    is_active   BOOLEAN          DEFAULT TRUE,
+    created_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE shop_users
+(
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    shop_id    UUID REFERENCES shops (id) ON DELETE CASCADE,
+    user_id    UUID REFERENCES customers (id) ON DELETE CASCADE,
+    role       TEXT CHECK (role IN ('OWNER', 'MANAGER', 'STAFF')) NOT NULL,
+    created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (shop_id, user_id)
+);
+
 
 CREATE TABLE products
 (
@@ -18,6 +41,7 @@ CREATE TABLE products
     image_url   TEXT,
     stock       INTEGER          DEFAULT 0,
     category    TEXT,
+    shop_id     UUID REFERENCES shops (id) ON DELETE CASCADE,
     is_active   BOOLEAN          DEFAULT TRUE,
     created_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
@@ -25,6 +49,7 @@ CREATE TABLE products
 CREATE TABLE orders
 (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    shop_id           UUID REFERENCES shops (id) ON DELETE CASCADE,
     customer_id       UUID REFERENCES customers (id) ON DELETE CASCADE,
     status            TEXT CHECK (status IN
                                   ('PENDING', 'PAID', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED')) NOT NULL,
