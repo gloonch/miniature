@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 //type Role string
 
@@ -11,11 +14,12 @@ import "time"
 //)
 
 type Customer struct {
-	ID              string
-	Phone           string
-	Name            string
-	Role            string
-	TotalSpent      float64
-	CashbackBalance float64
-	CreatedAt       time.Time
+	ID              uuid.UUID `json:"id"`
+	Phone           string    `json:"phone"`
+	Name            string    `json:"name"`
+	Role            string    `json:"role"`
+	TotalSpent      float64   `json:"total_spent"`
+	CashbackBalance float64   `json:"cashback_balance"`
+	IsActive        bool      `json:"is_active"`
+	CreatedAt       time.Time `json:"created_at"`
 }

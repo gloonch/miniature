@@ -1,9 +1,8 @@
 package interfaces
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/gloonch/miniature/customer/internal/application"
-	//"github.com/gloonch/miniature/customer/internal/domain"
-	"encoding/json"
 	"net/http"
 )
 
@@ -15,40 +14,25 @@ func NewCustomerHandler(u application.CustomerUsecase) *CustomerHandler {
 	return &CustomerHandler{usecase: u}
 }
 
-func (h *CustomerHandler) RegisterCustomer(w http.ResponseWriter, r *http.Request) {
-	var req CreateCustomerRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
-		return
+func (h *CustomerHandler) Register(c *gin.Context) {
+	var req struct {
+		Name  string `json:"name"`
+		Phone string `json:"phone"`
+		Role  string `json:"role"`
 	}
-	customer, err := h.usecase.RegisterCustomer(req.Phone, req.Name, req.Role)
-	if err != nil {
-		http.Error(w, "Failed to create customer", http.StatusInternalServerError)
-		return
-	}
-	writeJSON(w, http.StatusCreated, customer)
-}
 
-func (h *CustomerHandler) GetCustomerByPhone(w http.ResponseWriter, r *http.Request) {
-	phone := r.URL.Query().Get("phone")
-	if phone == "" {
-		http.Error(w, "Phone required", http.StatusBadRequest)
-		return
-	}
-	customer, err := h.usecase.GetCustomerByPhone(phone)
-	if err != nil {
-		http.Error(w, "Error fetching customer", http.StatusInternalServerError)
-		return
-	}
-	if customer == nil {
-		http.NotFound(w, r)
-		return
-	}
-	writeJSON(w, http.StatusOK, customer)
-}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 
-func writeJSON(w http.ResponseWriter, status int, v interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(v)
+		return
+	}
+
+	customer, cErr := h.usecase.RegisterCustomer(req.Name, req.Phone, req.Role)
+	if cErr != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": cErr.Error()})
+
+		return
+	}
+
+	c.JSON(http.StatusCreated, customer)
 }

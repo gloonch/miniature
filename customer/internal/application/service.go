@@ -16,7 +16,7 @@ func NewCustomerService(repo domain.CustomerRepository) *customerService {
 
 func (cs *customerService) RegisterCustomer(phone, name, role string) (*domain.Customer, error) {
 	customer := domain.Customer{
-		ID:              uuid.NewString(),
+		ID:              uuid.New(),
 		Phone:           phone,
 		Name:            name,
 		Role:            role,

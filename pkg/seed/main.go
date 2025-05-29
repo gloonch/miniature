@@ -11,9 +11,9 @@ func main() {
 	db := NewPostgresConnection()
 	defer db.Close()
 
-	customerTable := "customers"
+	customerTable := "customer"
 	customerDDL := `
-		CREATE TABLE customers (
+		CREATE TABLE customer (
 			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			phone VARCHAR(20) UNIQUE NOT NULL,
 			name TEXT,
@@ -24,7 +24,7 @@ func main() {
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		);`
 	customerSeed := `
-		INSERT INTO customers (id, phone, name, role)
+		INSERT INTO customer (id, phone, name, role)
 		VALUES 
 			(gen_random_uuid(), '09121234567', 'Alice', 'OWNER'),
 			(gen_random_uuid(), '09121234568', 'Bob', 'CUSTOMER'),
@@ -38,7 +38,7 @@ func main() {
 	shopDDL := `
 	CREATE TABLE shops (
 		id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-		owner_id UUID REFERENCES customers (id) ON DELETE CASCADE,
+		owner_id UUID REFERENCES customer (id) ON DELETE CASCADE,
 		name TEXT NOT NULL,
 		description TEXT,
 		is_active BOOLEAN DEFAULT TRUE,
@@ -49,11 +49,11 @@ func main() {
 	INSERT INTO shops (id, owner_id, name, description)
 	VALUES 
 		(gen_random_uuid(), 
-		 (SELECT id FROM customers WHERE phone = '09121234567' LIMIT 1), 
+		 (SELECT id FROM customer WHERE phone = '09121234567' LIMIT 1), 
 		 'فروشگاه آلیس', 'پوشاک زنانه'),
 
 		(gen_random_uuid(), 
-		 (SELECT id FROM customers WHERE phone = '09121234568' LIMIT 1), 
+		 (SELECT id FROM customer WHERE phone = '09121234568' LIMIT 1), 
 		 'فروشگاه باب', 'اکسسوری و زیورآلات');`
 
 	_ = ensureTableExists(db, shopTable, shopDDL)
