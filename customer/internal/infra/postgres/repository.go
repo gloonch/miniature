@@ -3,7 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"errors"
-	"github.com/gloonch/miniature/customer/internal/domain"
+	"miniature/customer/internal/domain"
 )
 
 type customerRepository struct {

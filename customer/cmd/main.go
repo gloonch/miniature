@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/gloonch/miniature/customer/internal/application"
-	"github.com/gloonch/miniature/customer/internal/domain"
-	"github.com/gloonch/miniature/customer/internal/infra/postgres"
-	"github.com/gloonch/miniature/customer/internal/interfaces"
 	"log"
+	"miniature/customer/internal/application"
+	"miniature/customer/internal/domain"
+	"miniature/customer/internal/infra/postgres"
+	"miniature/customer/internal/interfaces"
 )
 
 func main() {

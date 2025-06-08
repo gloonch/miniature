@@ -1,8 +1,8 @@
 package application
 
 import (
-	"github.com/gloonch/miniature/customer/internal/domain"
 	"github.com/google/uuid"
+	"miniature/customer/internal/domain"
 	"time"
 )
 

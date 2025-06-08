@@ -1,6 +1,6 @@
 package application
 
-import "github.com/gloonch/miniature/customer/internal/domain"
+import "miniature/customer/internal/domain"
 
 type CustomerUsecase interface {
 	RegisterCustomer(phone, name, role string) (*domain.Customer, error)

@@ -1,4 +1,4 @@
-module github.com/gloonch/miniature/pkg/seed
+module miniature/pkg/seed
 
 go 1.23.0
 

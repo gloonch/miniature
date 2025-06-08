@@ -2,7 +2,7 @@ package interfaces
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/gloonch/miniature/customer/internal/application"
+	"miniature/customer/internal/application"
 	"net/http"
 )
 
