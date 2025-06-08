@@ -12,13 +12,14 @@ func NewRouter(handler CustomerHandler) *gin.Engine {
 	{
 		customers := v1.Group("/customer")
 		{
-			customers.POST("/", handler.Register)
-			// Add more routes...
+			customers.POST("/register", handler.Register)
+			customers.POST("/login", handler.Login)
+			customers.POST("/logout", handler.Logout)
 
 			protected := customers.Group("/")
 			protected.Use(AuthMiddleware())
 			{
-				//protected.GET("/me", handler.Me)
+				protected.GET("/me", handler.Me)
 			}
 		}
 	}
