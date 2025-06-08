@@ -43,11 +43,12 @@ func (r *customerRepository) FindByID(id string) (*domain.Customer, error) {
 	var customer domain.Customer
 	if err := row.Scan(
 		&customer.ID,
-		&customer.Name,
 		&customer.Phone,
+		&customer.Name,
 		&customer.Role,
 		&customer.TotalSpent,
 		&customer.CashbackBalance,
+		&customer.IsActive,
 		&customer.CreatedAt); err != nil {
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
@@ -66,11 +67,12 @@ func (r *customerRepository) FindByPhone(phone string) (*domain.Customer, error)
 	var customer domain.Customer
 	if err := row.Scan(
 		&customer.ID,
-		&customer.Name,
 		&customer.Phone,
+		&customer.Name,
 		&customer.Role,
 		&customer.TotalSpent,
 		&customer.CashbackBalance,
+		&customer.IsActive,
 		&customer.CreatedAt); err != nil {
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {

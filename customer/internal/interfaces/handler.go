@@ -24,14 +24,24 @@ func (h *CustomerHandler) Register(c *gin.Context) {
 		return
 	}
 
-	customer, cErr := h.usecase.RegisterCustomer(req.Name, req.Phone, req.Role)
+	customer, cErr := h.usecase.RegisterCustomer(req.Phone, req.Name, req.Role)
 	if cErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": cErr.Error()})
 
 		return
 	}
 
-	c.JSON(http.StatusCreated, customer)
+	token, err := token.GenerateToken(customer.ID.String(), customer.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not generate token"})
+
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"user":  customer,
+		"token": token,
+	})
 }
 
 func (h *CustomerHandler) Login(c *gin.Context) {
@@ -42,8 +52,9 @@ func (h *CustomerHandler) Login(c *gin.Context) {
 	}
 
 	customer, err := h.usecase.GetCustomerByPhone(req.Phone)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "user not found"})
+	if err != nil || customer == nil {
+		c.JSON(http.StatusNoContent, gin.H{"error": "user not found"})
+
 		return
 	}
 
@@ -61,7 +72,7 @@ func (h *CustomerHandler) Logout(c *gin.Context) {
 }
 
 func (h *CustomerHandler) Me(c *gin.Context) {
-	userID, exists := c.Get("userID")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
