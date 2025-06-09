@@ -15,11 +15,11 @@ services:
       timeout: 5s
       retries: 5
 
-  customer:
-    build:
-      context: ./customer/
-      dockerfile: Dockerfile
-    depends_on:
-      postgres:
-        condition: service_healthy
+#  customer:
+#    build:
+#      context: ./customer/
+#      dockerfile: Dockerfile
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
 
