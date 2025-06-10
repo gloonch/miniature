@@ -1,7 +1,7 @@
 package domain
 
-// Repository defines the interface for interacting with shop data.
-type Repository interface {
+// ShopRepository defines the interface for interacting with shop data.
+type ShopRepository interface {
 	Create(shop *Shop) error
 	FindByID(id string) (*Shop, error)
 	FindByOwnerID(ownerID string) ([]*Shop, error)

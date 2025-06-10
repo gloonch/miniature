@@ -2,18 +2,18 @@ package interfaces
 
 import (
 	"database/sql" // Added for sql.ErrNoRows
-	"miniature/shop/internal/application"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/segment-sources/sources-backend-takehome-assignment/shop/internal/application"
 	// "github.com/segment-sources/sources-backend-takehome-assignment/shop/internal/domain" // For ShopResponse, if it's different from domain.Shop
 )
 
 type ShopHandler struct {
-	usecase application.Usecase
+	usecase application.ShopUsecase
 }
 
-func NewShopHandler(u application.Usecase) *ShopHandler {
+func NewShopHandler(u application.ShopUsecase) *ShopHandler {
 	return &ShopHandler{usecase: u}
 }
 
@@ -49,11 +49,11 @@ func (h *ShopHandler) CreateShop(c *gin.Context) {
 	// Authorization: Only "SELLER" role can create shops for now
 	// TODO: Make "SELLER" a constant or configurable
 	if roleStr != "SELLER" {
-		//c.JSON(http.StatusForbidden, gin.H{"error": "user does not have permission to create a shop"})
-		//return
+		c.JSON(http.StatusForbidden, gin.H{"error": "user does not have permission to create a shop"})
+		return
 	}
 
-	shop, err := h.usecase.CreateShop(req.Name, userIDStr)
+	shop, err := h.usecase.CreateShop(req.Name, userIDStr, req.Address)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create shop: " + err.Error()})
 		return
@@ -133,11 +133,11 @@ func (h *ShopHandler) UpdateShop(c *gin.Context) {
 	}
 
 	if roleStr != "SELLER" { // Assuming "SELLER" role is required to update
-		//c.JSON(http.StatusForbidden, gin.H{"error": "user does not have permission to update shops"})
-		//return
+		c.JSON(http.StatusForbidden, gin.H{"error": "user does not have permission to update shops"})
+		return
 	}
 
-	updatedShop, err := h.usecase.UpdateShop(shopID, userIDStr, req.Name, req.IsActive)
+	updatedShop, err := h.usecase.UpdateShop(shopID, userIDStr, req.Name, req.Address, req.IsActive)
 	if err != nil {
 		// Basic error handling, can be more granular
 		if err.Error() == "shop not found" {
@@ -181,9 +181,8 @@ func (h *ShopHandler) DeleteShop(c *gin.Context) {
 	}
 
 	if roleStr != "SELLER" { // Assuming "SELLER" role is required to delete
-		// TODO check the correct role
-		//c.JSON(http.StatusForbidden, gin.H{"error": "user does not have permission to delete shops"})
-		//return
+		c.JSON(http.StatusForbidden, gin.H{"error": "user does not have permission to delete shops"})
+		return
 	}
 
 	err := h.usecase.DeleteShop(shopID, userIDStr)

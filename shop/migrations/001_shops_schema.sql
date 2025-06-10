@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS shops (
     address TEXT,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_owner
         FOREIGN KEY(owner_id)
         REFERENCES customers(id)

@@ -1,12 +1,12 @@
 package application
 
-import "miniature/shop/internal/domain"
+import "github.com/segment-sources/sources-backend-takehome-assignment/shop/internal/domain"
 
-// Usecase defines the interface for shop-related business logic.
-type Usecase interface {
-	CreateShop(name, ownerID string) (*domain.Shop, error)
+// ShopUsecase defines the interface for shop-related business logic.
+type ShopUsecase interface {
+	CreateShop(name, ownerID, address string) (*domain.Shop, error)
 	GetShopByID(id string) (*domain.Shop, error)
 	GetShopsByOwnerID(ownerID string) ([]*domain.Shop, error)
-	UpdateShop(id, userIDFromTokenStr, name string, isActive bool) (*domain.Shop, error)
-	DeleteShop(id, userIDFromTokenStr string) error
+	UpdateShop(id, name, address string, isActive bool) (*domain.Shop, error)
+	DeleteShop(id string) error
 }
