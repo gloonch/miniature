@@ -34,7 +34,6 @@ CREATE TABLE shop_users
 CREATE TABLE products
 (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    code        VARCHAR(50) UNIQUE NOT NULL, -- SL38 یا مشابه
     title       TEXT               NOT NULL,
     description TEXT,
     price       NUMERIC            NOT NULL,

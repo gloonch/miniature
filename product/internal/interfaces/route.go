@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(handler *ProductHandler, authMiddleware gin.HandlerFunc) *gin.Engine {
+func NewRouter(handler *Handler) *gin.Engine {
 	r := gin.Default()
 
 	// Health check endpoint
@@ -15,22 +15,18 @@ func NewRouter(handler *ProductHandler, authMiddleware gin.HandlerFunc) *gin.Eng
 	v1 := r.Group("/v1")
 	{
 		shopProducts := v1.Group("/shops/:shop_id/products")
-		if authMiddleware != nil {
-			shopProducts.Use(authMiddleware)
-		}
-		if handler != nil {
+		shopProducts.Use(AuthMiddleware())
+		{
 			shopProducts.POST("", handler.CreateProduct)
 			shopProducts.GET("", handler.GetShopProducts)
 		}
 
 		productRoutes := v1.Group("/products")
-		if authMiddleware != nil {
-			productRoutes.Use(authMiddleware)
-		}
-		if handler != nil {
+		productRoutes.Use(AuthMiddleware())
+		{
 			productRoutes.GET("/:product_id", handler.GetProduct)
 			productRoutes.PUT("/:product_id", handler.UpdateProduct)
-			productRoutes.DELETE("/:product_id", handler.DeleteProduct) // Added
+			productRoutes.DELETE("/:product_id", handler.DeleteProduct)
 		}
 	}
 	return r

@@ -1,11 +1,10 @@
 package interfaces
 
 import (
+	"github.com/gin-gonic/gin"
+	"miniature/pkg/token"
 	"net/http"
 	"strings"
-
-	"github.com/gin-gonic/gin"
-	"github.com/segment-sources/sources-backend-takehome-assignment/pkg/token" // Adjusted import path
 )
 
 func AuthMiddleware() gin.HandlerFunc {

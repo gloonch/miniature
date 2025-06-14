@@ -1,21 +1,20 @@
 package application
 
 import (
-	"database/sql" // For sql.ErrNoRows
+	"database/sql"
 	"errors"
+	"miniature/product/internal/domain"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/segment-sources/sources-backend-takehome-assignment/product/internal/domain"
-	// "github.com/segment-sources/sources-backend-takehome-assignment/shop/internal/application" // Example for shopservice
 )
 
 type productService struct {
-	repo                 domain.ProductRepository
+	repo                 domain.Repository
 	shopOwnershipChecker domain.ShopOwnershipCheckerRepository // Added
 }
 
-func NewProductService(repo domain.ProductRepository, shopChecker domain.ShopOwnershipCheckerRepository) ProductUsecase { // Updated
+func NewProductService(repo domain.Repository, shopChecker domain.ShopOwnershipCheckerRepository) Usecase { // Updated
 	return &productService{repo: repo, shopOwnershipChecker: shopChecker} // Updated
 }
 
@@ -53,7 +52,6 @@ func (s *productService) CreateProduct(shopIDStr, name, description string, pric
 		StockQuantity: stockQuantity,
 		IsActive:      true, // Default to active
 		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
 	}
 
 	err = s.repo.Create(product)
@@ -133,7 +131,6 @@ func (s *productService) UpdateProduct(
 	if isActive != nil {
 		product.IsActive = *isActive
 	}
-	product.UpdatedAt = time.Now()
 
 	err = s.repo.Update(product)
 	if err != nil {

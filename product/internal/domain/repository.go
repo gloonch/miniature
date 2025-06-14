@@ -1,6 +1,6 @@
 package domain
 
-type ProductRepository interface {
+type Repository interface {
 	Create(product *Product) error
 	FindByID(id string) (*Product, error)
 	FindByShopID(shopID string) ([]*Product, error)

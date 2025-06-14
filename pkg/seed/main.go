@@ -64,25 +64,24 @@ func main() {
 	productDDL := `
 	CREATE TABLE products (
 		id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-		code VARCHAR(50) UNIQUE NOT NULL,
-		title TEXT NOT NULL,
+		name TEXT NOT NULL,
+		sku TEXT,
 		description TEXT,
 		price NUMERIC NOT NULL,
 		image_url TEXT,
-		stock INTEGER DEFAULT 0,
-		category TEXT,
+		stock_quantity INTEGER DEFAULT 0,
 		shop_id UUID REFERENCES shops (id) ON DELETE CASCADE,
 		is_active BOOLEAN DEFAULT TRUE,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);`
 
 	productSeed := `
-	INSERT INTO products (id, code, title, description, price, stock, category, shop_id)
+	INSERT INTO products (id, title, description, price, stock, category, shop_id)
 	VALUES 
-		(gen_random_uuid(), 'SL38', 'شلوار جین زنانه', 'شلوار جین آبی سایز 38', 490000, 10, 'پوشاک',
+		(gen_random_uuid(), 'شلوار جین زنانه', 'شلوار جین آبی سایز 38', 490000, 10, 'پوشاک',
 		 (SELECT id FROM shops WHERE name = 'فروشگاه آلیس' LIMIT 1)),
 
-		(gen_random_uuid(), 'BLK01', 'کیف چرمی مشکی', 'کیف رودوشی چرمی کلاسیک', 750000, 5, 'اکسسوری',
+		(gen_random_uuid(), 'کیف چرمی مشکی', 'کیف رودوشی چرمی کلاسیک', 750000, 5, 'اکسسوری',
 		 (SELECT id FROM shops WHERE name = 'فروشگاه باب' LIMIT 1));`
 
 	_ = ensureTableExists(db, productTable, productDDL)

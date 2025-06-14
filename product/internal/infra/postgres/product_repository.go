@@ -2,36 +2,36 @@ package postgres
 
 import (
 	"database/sql"
-	"github.com/segment-sources/sources-backend-takehome-assignment/product/internal/domain"
+	"miniature/product/internal/domain"
 )
 
-type postgresProductRepository struct {
+type repository struct {
 	db *sql.DB
 }
 
-func NewPostgresProductRepository(db *sql.DB) domain.ProductRepository {
-	return &postgresProductRepository{db: db}
+func NewRepository(db *sql.DB) *repository {
+	return &repository{db: db}
 }
 
-func (r *postgresProductRepository) Create(product *domain.Product) error {
+func (r *repository) Create(product *domain.Product) error {
 	query := `INSERT INTO products
-              (id, shop_id, name, description, price, sku, stock_quantity, is_active, created_at, updated_at)
-              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
+              (id, shop_id, name, description, price, sku, stock_quantity, is_active, created_at)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
 	_, err := r.db.Exec(query,
 		product.ID, product.ShopID, product.Name, product.Description, product.Price,
-		product.SKU, product.StockQuantity, product.IsActive, product.CreatedAt, product.UpdatedAt,
+		product.SKU, product.StockQuantity, product.IsActive, product.CreatedAt,
 	)
 	return err
 }
 
-func (r *postgresProductRepository) FindByID(id string) (*domain.Product, error) {
+func (r *repository) FindByID(id string) (*domain.Product, error) {
 	product := &domain.Product{}
-	query := `SELECT id, shop_id, name, description, price, sku, stock_quantity, is_active, created_at, updated_at
+	query := `SELECT id, shop_id, name, description, price, sku, stock_quantity, is_active, created_at
               FROM products WHERE id = $1`
 	row := r.db.QueryRow(query, id)
 	err := row.Scan(
 		&product.ID, &product.ShopID, &product.Name, &product.Description, &product.Price,
-		&product.SKU, &product.StockQuantity, &product.IsActive, &product.CreatedAt, &product.UpdatedAt,
+		&product.SKU, &product.StockQuantity, &product.IsActive, &product.CreatedAt,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -42,9 +42,9 @@ func (r *postgresProductRepository) FindByID(id string) (*domain.Product, error)
 	return product, nil
 }
 
-func (r *postgresProductRepository) FindByShopID(shopID string) ([]*domain.Product, error) {
+func (r *repository) FindByShopID(shopID string) ([]*domain.Product, error) {
 	var products []*domain.Product
-	query := `SELECT id, shop_id, name, description, price, sku, stock_quantity, is_active, created_at, updated_at
+	query := `SELECT id, shop_id, name, description, price, sku, stock_quantity, is_active, created_at
               FROM products WHERE shop_id = $1`
 	rows, err := r.db.Query(query, shopID)
 	if err != nil {
@@ -56,7 +56,7 @@ func (r *postgresProductRepository) FindByShopID(shopID string) ([]*domain.Produ
 		product := &domain.Product{}
 		err := rows.Scan(
 			&product.ID, &product.ShopID, &product.Name, &product.Description, &product.Price,
-			&product.SKU, &product.StockQuantity, &product.IsActive, &product.CreatedAt, &product.UpdatedAt,
+			&product.SKU, &product.StockQuantity, &product.IsActive, &product.CreatedAt,
 		)
 		if err != nil {
 			return nil, err // Or collect errors and continue
@@ -69,24 +69,23 @@ func (r *postgresProductRepository) FindByShopID(shopID string) ([]*domain.Produ
 	return products, nil
 }
 
-func (r *postgresProductRepository) Update(product *domain.Product) error {
+func (r *repository) Update(product *domain.Product) error {
 	query := `UPDATE products SET
                 name = $1,
                 description = $2,
                 price = $3,
                 sku = $4,
                 stock_quantity = $5,
-                is_active = $6,
-                updated_at = $7
-              WHERE id = $8 AND shop_id = $9` // shop_id in WHERE for safety, though id is PK
+                is_active = $6
+              WHERE id = $7 AND shop_id = $8` // shop_id in WHERE for safety, though id is PK
 	_, err := r.db.Exec(query,
 		product.Name, product.Description, product.Price, product.SKU,
-		product.StockQuantity, product.IsActive, product.UpdatedAt, product.ID, product.ShopID,
+		product.StockQuantity, product.IsActive, product.ID, product.ShopID,
 	)
 	return err
 }
 
-func (r *postgresProductRepository) Delete(id string) error {
+func (r *repository) Delete(id string) error {
 	query := `DELETE FROM products WHERE id = $1`
 	result, err := r.db.Exec(query, id)
 	if err != nil {

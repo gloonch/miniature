@@ -1,8 +1,8 @@
 package interfaces
 
 import (
-	"time"
 	"github.com/google/uuid"
+	"time"
 )
 
 type CreateProductRequest struct {
@@ -25,7 +25,6 @@ type ProductResponse struct {
 	StockQuantity int       `json:"stock_quantity"`
 	IsActive      bool      `json:"is_active"`
 	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 type UpdateProductRequest struct {

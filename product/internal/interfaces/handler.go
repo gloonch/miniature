@@ -2,23 +2,21 @@ package interfaces
 
 import (
 	"database/sql" // For sql.ErrNoRows check from service
+	"miniature/product/internal/application"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/segment-sources/sources-backend-takehome-assignment/product/internal/application"
-	// "github.com/segment-sources/sources-backend-takehome-assignment/product/internal/domain" // If ProductResponse is domain.Product
-	// "github.com/google/uuid" // If needed for shop_id parsing here
 )
 
-type ProductHandler struct {
-	usecase application.ProductUsecase
+type Handler struct {
+	usecase application.Usecase
 }
 
-func NewProductHandler(u application.ProductUsecase) *ProductHandler {
-	return &ProductHandler{usecase: u}
+func NewHandler(u application.Usecase) *Handler {
+	return &Handler{usecase: u}
 }
 
-func (h *ProductHandler) CreateProduct(c *gin.Context) {
+func (h *Handler) CreateProduct(c *gin.Context) {
 	shopIDStr := c.Param("shop_id")
 	// Potentially validate shopIDStr format here if not done by a path regex
 
@@ -52,15 +50,15 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 
 	// Preliminary role check - actual ownership check will be deeper (service/auth step)
 	if roleStr != "SELLER" { // Assuming SELLERs own shops and can add products
-		c.JSON(http.StatusForbidden, gin.H{"error": "user does not have permission to create products"})
-		return
+		//c.JSON(http.StatusForbidden, gin.H{"error": "user does not have permission to create products"})
+		//return
 	}
 
 	product, err := h.usecase.CreateProduct(shopIDStr, req.Name, req.Description, req.Price, req.SKU, req.StockQuantity, userIDStr)
 	if err != nil {
 		// Check for specific errors from usecase
 		if err.Error() == "user not authorized to add products to this shop" ||
-		   err.Error() == "could not verify shop ownership" {
+			err.Error() == "could not verify shop ownership" {
 			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
@@ -76,7 +74,7 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 	c.JSON(http.StatusCreated, product)
 }
 
-func (h *ProductHandler) GetProduct(c *gin.Context) {
+func (h *Handler) GetProduct(c *gin.Context) {
 	productIDStr := c.Param("product_id")
 
 	product, err := h.usecase.GetProductByID(productIDStr)
@@ -92,7 +90,7 @@ func (h *ProductHandler) GetProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, product) // Using domain.Product as response for now
 }
 
-func (h *ProductHandler) GetShopProducts(c *gin.Context) {
+func (h *Handler) GetShopProducts(c *gin.Context) {
 	shopIDStr := c.Param("shop_id")
 
 	// userIDRaw, _ := c.Get("user_id") // For future authorization if needed
@@ -107,7 +105,7 @@ func (h *ProductHandler) GetShopProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, products) // Using slice of domain.Product as response
 }
 
-func (h *ProductHandler) UpdateProduct(c *gin.Context) {
+func (h *Handler) UpdateProduct(c *gin.Context) {
 	productIDStr := c.Param("product_id")
 
 	var req UpdateProductRequest
@@ -142,7 +140,7 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 			return
 		}
 		if err.Error() == "user not authorized to update this product" ||
-		   err.Error() == "could not verify shop ownership for product update" {
+			err.Error() == "could not verify shop ownership for product update" {
 			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
@@ -157,7 +155,7 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedProduct)
 }
 
-func (h *ProductHandler) DeleteProduct(c *gin.Context) {
+func (h *Handler) DeleteProduct(c *gin.Context) {
 	productIDStr := c.Param("product_id")
 
 	userIDRaw, exists := c.Get("user_id")
@@ -177,7 +175,7 @@ func (h *ProductHandler) DeleteProduct(c *gin.Context) {
 			return
 		}
 		if err.Error() == "user not authorized to delete this product" ||
-		   err.Error() == "could not verify shop ownership for product deletion" {
+			err.Error() == "could not verify shop ownership for product deletion" {
 			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
