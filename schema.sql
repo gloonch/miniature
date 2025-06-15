@@ -25,7 +25,7 @@ CREATE TABLE shop_users
     id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     shop_id    UUID REFERENCES shops (id) ON DELETE CASCADE,
     user_id    UUID REFERENCES customers (id) ON DELETE CASCADE,
-    role       TEXT CHECK (role IN ('OWNER', 'MANAGER', 'STAFF')) NOT NULL,
+    role       TEXT CHECK (role IN ('OWNER', 'SELLER')) NOT NULL,
     created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (shop_id, user_id)
 );

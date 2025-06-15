@@ -42,16 +42,11 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "role not found in context"})
 		return
 	}
-	roleStr, ok := roleRaw.(string)
+
+	_, ok = roleRaw.(string)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "role is not of type string"})
 		return
-	}
-
-	// Preliminary role check - actual ownership check will be deeper (service/auth step)
-	if roleStr != "SELLER" { // Assuming SELLERs own shops and can add products
-		//c.JSON(http.StatusForbidden, gin.H{"error": "user does not have permission to create products"})
-		//return
 	}
 
 	product, err := h.usecase.CreateProduct(shopIDStr, req.Name, req.Description, req.Price, req.SKU, req.StockQuantity, userIDStr)
@@ -164,8 +159,6 @@ func (h *Handler) DeleteProduct(c *gin.Context) {
 		return
 	}
 	userIDStr, _ := userIDRaw.(string)
-	// Role check for deletion might be relevant if, e.g., only "SELLER" or "ADMIN" can delete
-	// For now, primary auth is ownership, handled by service.
 
 	err := h.usecase.DeleteProduct(productIDStr, userIDStr)
 

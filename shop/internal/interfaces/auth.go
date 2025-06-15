@@ -25,7 +25,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// store user info in context
 		c.Set("user_id", claims.UserID)
-		// Roles might be different for shops, e.g., "shop_owner", "shop_staff"
+		// Roles might be different for shops, e.g., "OWNER", "SELLER"
 		// For now, keeping it as claims.Role but this might need adjustment
 		c.Set("role", claims.Role)
 		c.Next()

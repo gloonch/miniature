@@ -65,7 +65,7 @@ func main() {
 	CREATE TABLE products (
 		id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 		name TEXT NOT NULL,
-		sku TEXT,
+		sku TEXT UNIQUE,
 		description TEXT,
 		price NUMERIC NOT NULL,
 		image_url TEXT,
